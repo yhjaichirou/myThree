@@ -1,0 +1,78 @@
+
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head  th:replace="template::cmsHeader(首页)"></head>
+<style>
+html,body{
+height:100%;}
+.layui-fluid{
+line-height:300px;
+text-algin:center;
+height:calc(100% - 30px);
+background:url('/miniload/image/bg2.jpg');
+}
+.shwo-text{
+text-align: center;
+font-size: 30px;
+font-style: italic;
+font-weight: bold;
+color:burlywood;
+}
+</style>
+<body>
+  
+  
+   <div class="layui-fluid" >
+   		
+      <div class="shwo-text" >
+      		欢迎登陆！！
+    </div>
+  </div>
+ 	<!-- js -->
+   <div th:replace="template::commonJs"></div>
+   <script>
+  layui.config({
+	    base: contextPath+"/layuiadmin/" 
+	}).extend({
+		    index: 'lib/index' 
+	}).use(['index','console'],function(){
+		
+		/* //获取快捷栏
+		$.post(contextPath+"/index/quickKey",{},function(res){
+			  var quickKeyHtml = ``;
+			  $.each(res,function(k,v){
+				  if(v.children.length>0){
+					  $.each(v.children,function(k2,v2){
+					  quickKeyHtml += `
+						  <li class="layui-col-xs3">
+		                  <a lay-href="/dzb/${v2.url}" _id="${v2.id}" class="click1">
+		                    <i class="layui-icon layui-icon-console"></i>
+		                    <cite>${v2.name}</cite>
+		                  </a>
+		                </li>
+					  `;
+					  });
+				  }
+				 
+			  });
+			  $(".quickKey").html(quickKeyHtml);
+		  }) */
+		
+		
+		  /*  $(".click1").click(function(){
+				$.ajax({
+					url:"/dzb/api/task/getMeetType",
+					data:{"branchId":35},
+					success:function(rt){
+						console.log(rt)
+					}
+					
+					
+				})
+			}) */
+	});
+  </script>
+</body>
+</html>
+

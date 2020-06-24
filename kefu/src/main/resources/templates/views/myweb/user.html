@@ -1,0 +1,364 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="template::cmsHeader(后台用户管理)"></head>
+<style>
+.layui-rate {
+	padding: 0px;
+}
+.layui-form-selected dl{
+	max-height:180px;
+}
+</style>
+<body>
+
+	<div class="layui-fluid">
+		<div class="layui-card">
+			
+			<div class="layui-card-body">
+				<table class="layui-table" id="LAY-user-back-role"
+					lay-filter="LAY-user-back-role">
+				</table>
+				<h4 style="padding: 10px 0px;color: #d15d5d;">注：新添加账户密码默认为"账户名"+"123"</h4>
+				<script type="text/html" id="toolbarDemo">
+                    <div class="layui-btn-container">
+					 <button class="layui-btn layui-btn-sm" lay-event="addAdmin" >新增管理员</button>
+  					</div>
+				</script>
+
+<!-- 	 <button class="layui-btn layui-btn-sm" lay-event="batchdel" id="batchdel">删除</button> -->
+				<script type="text/html" id="barDemo">
+ 					{{#  if(d.roleId == 1){ }}
+							<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+  					{{#  } 
+					
+					else { }}
+    					<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+    						<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="stop"><i class="layui-icon layui-icon-delete"></i>停用</a>
+  					{{#  } }}
+ 					
+
+				</script>
+				
+				
+			</div>
+		</div>
+	</div>
+
+	<!-- 模板js -->
+	<div th:replace="template::commonJs"></div>
+	<script th:inline="javascript" type="text/javascript">
+	var loginRoleId = [[${session.loginUser.roleId}]];
+	var loginUserId = [[${session.loginUser.id}]];
+  
+	layui.config({
+		base : contextPath + "/layuiadmin/modules/"
+	}).use(['table',"form","rate",'layarea'], function(){
+    var $ = layui.$
+    ,form = layui.form
+    ,table = layui.table,
+    rate = layui.rate,
+    layarea = layui.layarea;
+	var currPageUrl = "/index/";
+
+	
+    function delTarget(ids){
+		 layer.confirm('确定删除么', function(index){
+		      layer.close(index);
+		      //向服务端发送删除指令
+		     $.post(contextPath+currPageUrl+"user/del",{"ids":JSON.stringify(ids)},function(rt){
+      		  if(rt.code==200){
+      	          table.reload('LAY-user-back-role',{});
+      	          layer.msg('已删除');
+      		  }else{
+					layer_msg(4,rt.msg);
+				}
+      	    });
+		 }); 
+	}
+
+    
+    //执行toolbar事件
+	 table.on('toolbar(LAY-user-back-role)', function(obj){ //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+		  var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+		  //active[layEvent].call(this);
+		  if(layEvent === 'addAdmin'){ //查看
+			  addOrUpdate(null);//新增系统管理员
+		  }
+	});
+	//监听行工具事件
+	  table.on('tool(LAY-user-back-role)', function(obj){
+	    var data = obj.data;
+	    if(obj.event === 'del'){
+	    	 delTarget([data.id]);
+	    } else if(obj.event === 'edit'){
+	    	var type = 1;
+	    	if(data.enterpriseId==0){//系统管理员或者超管
+	    		type = 2;
+	    	}
+	    	addOrUpdate(data);
+	    	 //active.add(data);
+	    }
+	  });
+    render();
+    function render(){
+		table.render({
+		    elem: '#LAY-user-back-role'
+		    ,url:contextPath+currPageUrl+'user/getUsers'
+		    ,toolbar: '#toolbarDemo'
+		    ,page:true
+		    ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+		/*     ,where:{
+		    	enterId:enterId
+		    } */
+		    ,cols: [
+		    	[
+		    		{type:"checkbox"}
+		      ,{title: '序号',templet: '#xuhao', width:80}
+		      ,{field:'remarkName',title: '用户名字'}
+		      ,{field:'userName',title: '用户账号'}
+		      ,{field:'policeName',title: '所属派出所',templet:function(r){
+		    	  return r.policeId ==null || r.policeId ==0 ? "<span style='color:red'>系统管理员</span>":r.policeName;
+		      }}
+		      ,{field:'roleName',title: '角色'}
+		      ,{fixed: 'right', title:'操作', toolbar: '#barDemo'}
+		    	]
+		    ],
+		    parseData:function(res){
+		    	 
+		    },
+		    request: {
+		        pageName: 'page' //页码的参数名称，默认：page
+		        ,limitName: 'limit' //每页数据量的参数名，默认：limit
+		    },
+		    //完成回调
+		     done:function(res,curr1,count){
+		    	 //限制显示
+		    	/*  var that = this.elem.next();
+		             res.data.forEach(function (item, index) {
+			                if (item.roleId==1 && loginRoleId !=1) {
+			                    var tr = that.find(".layui-table-box tbody tr[data-index='" + index + "']").css("background-color", "#eee");
+			                    that.find(".layui-table-box tbody tr[data-index='" + index + "']").find("td:first-child>div").html("");
+			                    that.find(".layui-table-box tbody tr[data-index='" + index + "']").find("td:last-child>div").html("");
+			                } 
+			                if (loginUserId == item.id) {
+			                    var tr = that.find(".layui-table-box tbody tr[data-index='" + index + "']").css("background-color", "#eee");
+			                    that.find(".layui-table-box tbody tr[data-index='" + index + "']").find("td:first-child>div").html("");
+			                    that.find(".layui-table-box tbody tr[data-index='" + index + "']").find("td:last-child>div>.layui-btn:last").hide();
+			                } 
+			         }); */
+		    } 
+		  });
+	}
+	
+    form.verify({
+    	  username: function(value, item){ //value：表单的值、item：表单的DOM对象
+    		    if(value=''){
+    		      return '用户名不能为空！';
+    		    }
+    		    if(/^\d+\d+\d$/.test(value)){
+    		      return '用户名不能全为数字';
+    		    }
+    		    if(/(?!^\d+$)(?!^[a-zA-Z]+$)[0-9a-zA-Z]{4,23}/.test(value)){
+      		      return '请输入数字和字母组合';
+      		    }
+    	},
+    	 pwd: function(value, item){ //value：表单的值、item：表单的DOM对象
+ 		    if(value=''){
+ 		      return '用户名不能为空！';
+ 		    }
+ 		    if(/^\d+\d+\d$/.test(value)){
+ 		      return '用户名不能全为数字';
+ 		    }
+ 		    if(/(?!^\d+$)(?!^[a-zA-Z]+$)[0-9a-zA-Z]{4,23}/.test(value)){
+   		      return '请输入数字和字母组合';
+   		    }
+ 		}
+    }); 
+    
+    //监听提交
+    form.on('submit(submit)', submit);
+    function submit(data){
+    	 layer.confirm("请牢记此账户："+data.field.userName, function(index){
+    		 	//防止重复提交
+    	    	/* if($(".submit").hasClass("layui-btn-disabled")){
+    	    		return false;
+    	    	}
+    	    	$(".submit").addClass("layui-btn-disabled").html("提交中..."); */
+    	    	$.ajax({
+    				url:contextPath+currPageUrl+"user/addorupdate",
+    				type:"POST",
+    				data:data.field,
+    				success:function(data){
+    					console.log(data);
+    					if(data.code ==200){
+    						layer.closeAll();
+    						table.reload("LAY-user-back-role",{}); //表格重载
+    						layer.msg('已完成');
+    					}
+    					else{
+    						layer_msg(4,data.msg);
+    						//$(".submit").removeClass("layui-btn-disabled").html("立即提交");
+    					}
+    				},
+    				error:function(){
+    					//$(".submit").removeClass("layui-btn-disabled").html("立即提交");
+    				}
+    			});
+		 }); 
+        return false;
+    }
+  //增加或修改
+	function addOrUpdate(obj){
+	  console.log(obj)
+		layer_open("",["50%","60%"],obj==null?"新增":"修改",addOrUphtml(obj),function(){
+			var _data = obj==null?{}:{county:obj.areaName};
+			layarea.render({
+				elem : '#area-picker',
+				  data: _data,
+				change : function(res) {
+					//选择结果	
+					//console.log(res);
+					getPolices(obj,res.county);
+				}
+			});
+		
+			var bol = obj==null?false:true ,htmlroles='',pols='';
+			
+			 $.post(contextPath+currPageUrl+'user/roles',{},function(res){
+					$.each(res,function(k,v){
+						var select = bol? v.id==obj.roleId? "selected='selected'":"" :"";
+						htmlroles += `<option value="${v.id}" ${select}>${v.roleName}</option>`
+					});
+					$("select[name='roleId']").append(htmlroles);
+					form.render();
+			});
+			 $.post(contextPath+currPageUrl+'user/polices',{areaName:obj.areaName},function(res){
+				 $.each(res,function(k,v){
+						var select = obj!=null?v.id==obj.policeId?"selected=''":"":"";
+						pols+=`
+							<option value="${v.id}" ${select} >${v.name}</option>
+						`;
+					})
+					$("select[name='policeId']").append(pols);
+					form.render();
+			});
+			 //赋值
+			 if(bol){
+				 $("input[name='remarkName']").val(obj.remarkName);
+				 $("input[name='userName']").val(obj.userName);
+				 $("input[name='id']").val(obj.id);
+			 }
+			 $("#back").click(function(){
+				 layer.closeAll();
+			 })
+			 form.render();
+		 });
+	}
+  
+  function getPolices(data,area){
+	  $.ajax({
+			url : contextPath +currPageUrl+ "user/polices",
+			type : 'post',
+			data : {areaName:area},
+			success : function(res) {
+				var pols = "";
+				$.each(res,function(k,v){
+					var select = data!=null?v.id==data.areaId?"selected=''":"":"";
+					pols+=`
+						<option value="${v.id}" ${select} >${v.name}</option>
+					`;
+				})
+				$("select[name='policeId']").append(pols);
+				form.render();
+			}
+		});
+  }
+  function addOrUphtml(data){
+	  var roleHtml = ``;
+	  console.log(loginRoleId)
+		if(loginRoleId==8){//组织部
+			roleHtml = `
+				<input type="text" name="roleId" value="8" hidden="hidden">
+			`;
+		}else{
+			roleHtml = `
+				<div class="layui-form-item">
+			  	<label class="layui-form-label" >角色：</label>
+			    <div class="layui-input-block">
+			      <select name="roleId" lay-filter="roleId" lay-verify="required">
+			        <option value="">请选择</option>
+			      </select>
+			    </div>
+			  </div>  
+			`;
+		}
+	  return `
+	  <form class="layui-form addForm" id="addForm" action="" lay-filter="addForm" style="padding:20px;height:auto;">
+	    <div class="layui-form-item">
+		    <label class="layui-form-label">名字：</label>
+		    <div class="layui-input-block">
+		      <input type="text" name="remarkName" lay-verify="required" autocomplete="off" placeholder="请输入姓名" class="layui-input" maxlength="8">
+		    </div>
+	  </div>
+	
+	  <div class="layui-form-item">
+	    <label class="layui-form-label">登录账号：</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="userName" onkeyup="this.value=this.value.replace(/[^\\w_]/g,'');" oninput="if(value.length>18)value=value.slice(0,18)" lay-verify="userName" autocomplete="off" placeholder="请输入字符和数字组合(8~18)" class="layui-input" maxlength="18">
+	    </div>
+ 	  </div>  
+	  
+ 	 <div id="area-picker">
+	 	 <div class="layui-form-item" >
+			<label class="layui-form-label" >省：</label>
+			<div class="layui-input-block" >
+				<select name="province" class="province-selector"
+					data-value="请选择" lay-filter="province-1">
+					<option value="">请选择省</option>
+				</select>
+			</div>
+		</div>
+		<div class="layui-form-item" >
+			<label class="layui-form-label" >市：</label>
+			<div class="layui-input-block" >
+				<select name="city" class="city-selector" data-value="请选择"
+					lay-filter="city-1">
+					<option value="">请选择市</option>
+				</select>
+			</div>
+		</div>
+		<div class="layui-form-item" >
+			<label class="layui-form-label" >区：</label>
+			<div class="layui-input-block" >
+				<select name="county" class="county-selector" data-value="请选择"
+					lay-filter="county-1">
+					<option value="">请选择区</option>
+				</select>
+			</div>
+		</div>
+	 </div>
+	 
+ 	 <div class="layui-form-item">
+	  	<label class="layui-form-label" >派出所：</label>
+	    <div class="layui-input-block">
+	      <select name="policeId" lay-filter="policeId" lay-verify="required">
+	        <option value="">请选择</option>
+	      </select>
+	    </div>
+	  </div>  
+ 	  
+	  <input type="text" name="id" value="" hidden="hidden">
+	  <input type="text" name="roleId" value="2" hidden="hidden">
+	  <div style="text-align:center">
+		<button  class="layui-btn submit" lay-submit="" lay-filter="submit">立即提交</button>
+		<button type="button" id="back" class="layui-btn layui-btn-primary">返回</button>
+	</div>
+	  </form>
+	  `;
+  }
+
+  });
+  </script>
+</body>
+</html>

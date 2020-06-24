@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+
+<head th:fragment="cmsHeader(title)">
+	<meta charset="utf-8">
+	<title th:text="${title}"></title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<link rel="icon" th:href="@{/image/logo2.png}">
+	<link th:href="@{/layuiadmin/layui/css/layui.css}" rel="stylesheet"
+		media="all">
+	<link th:href="@{/layuiadmin/style/admin.css}" rel="stylesheet"
+		media="all">
+	<script>
+	  /^http(s*):\/\//.test(location.href) || alert('请先部署到 localhost 下再访问');
+	  </script>
+</head>
+
+<!-- 公用JS部分 -->
+<div th:fragment="commonJs">
+	<script th:src="@{/common/jquery-3.3.1-min.js}"></script>
+	<script th:src="@{/common/dateutil.js}"></script>
+	<script th:src="@{/common/loadPage.js}"></script>
+	<script th:src="@{/common/layerOpen.js}"></script>
+	<script th:src="@{/layuiadmin/layui/layui.js}"></script>
+	<script th:inline="javascript" type="text/javascript">
+		contextPath = [[${#request.getContextPath()}]];
+		var picGen = "https://customer.wlcb.net:8082/file/image/cat/";
+	</script>
+	<script type="text/html" id="xuhao">
+   		{{d.LAY_TABLE_INDEX+1}}
+	</script>
+</div>
+
+<!-- 上传图片 -->
+<div th:fragment="uploadJS">
+	<script type="text/javascript">
+		function changImg(e) {
+			for (var i = 0; i < e.target.files.length; i++) {
+				var file = e.target.files.item(i);
+				if (!(/^image\/.*$/i.test(file.type))) {
+					layer.msg("请选择图片类型文件");
+					continue; // 不是图片 就跳出这一次循环
+				}
+				// 实例化FileReader API
+				var freader = new FileReader();
+				freader.readAsDataURL(file);
+				freader.onload = function(e) {
+					$("#imgView").attr("src", e.target.result);
+					$("#imgView").css("border","none");
+					// $("#imgView").parent().attr("href",e.target.result);
+				}
+			}
+		}
+	</script>
+</div>
+
+<nav
+	class="con_contain d-flex align-items-center justify-content-between"
+	th:fragment="header(type,num)">
+	<a href=""><img class="logo sm-logo" th:src="@{/img/web/LOGO.png}"
+		alt="" srcset=""></a>
+	<ul class="d-flex flex-wrap align-items-center nomargin nor-nav">
+		<li th:each="nav:${navList}"
+			th:class="${nav.id == num}?'first active f-md-20 f14':'first f-md-20 f14'">
+			<div th:if="${#lists.size(nav.child)} le '0'">
+				<a th:href="${#request.getContextPath()+'/'+type+nav.url}">[[${nav.name}]]</a>
+			</div>
+			<div th:if="${#lists.size(nav.child)} gt '0'">
+				<a th:href="${#request.getContextPath()+ '/'+type+nav.url}">[[${nav.name}]]</a>
+				<span class="icon-diquxialajiantou iconfont"></span>
+				<ul
+					class="secondnav d-flex justify-content-center nomargin align-items-center">
+					<li class="f-md-20 f14" th:each="item:${nav.child}"><a
+						th:href="${#request.getContextPath()+ '/'+type+item.url}"
+						target="_blank"> [[${item.name}]] </a></li>
+				</ul>
+			</div>
+		</li>
+
+	</ul>
+	<div class="relative sm-nav">
+		<span class="iconfont icon-htmal5icon35"></span>
+		<ul class="animated ">
+			<li th:class="${nav.id == num}?'active':''"
+				th:each="nav,navstatu:${navList}"
+				th:style="'transition-delay:' + ${navstatu.index*0.1}+'s'">
+				<div>
+					<a th:href="${#request.getContextPath()+'/'+type+nav.url}">[[${nav.name}]]</a>
+				</div>
+			</li>
+		</ul>
+	</div>
+</nav>
+
+<footer th:fragment="footer">
+	<div
+		class="container d-flex justify-content-between align-items-center">
+		<ul class="row flex1">
+			<li class="col-md-6 col-12 row" style="margin-bottom: 100px;">
+				<div
+					class="col-6 flex-column row align-items-center justify-content-center">
+					<h3>联系我们</h3>
+					<p class="footTitle">Contact Us</p>
+				</div>
+				<div class="col-6" style="overflow: hidden;">
+					<h6 class="footTitle">关注</h6>
+					<div class="row con nomargin justify-content-start flex-wrap">
+						<div
+							class="iconed col-6 row flex-column jusitify-content-center align-items-start">
+							<section class="row flex-column nomargin">
+								<span class="iconfont icon-weixin1 pointer"
+									style="font-size: 33px;"></span> <span>珠海</span> <img
+									class="animated" alt="" th:src="@{/img/web/ewm.jpg}" />
+							</section>
+						</div>
+						<div
+							class="iconed col-6 row flex-column jusitify-content-center align-items-center nomargin">
+							<section class="row flex-column nomargin">
+								<span class="iconfont icon-weixin1 pointer"
+									style="font-size: 33px;"></span> <span>内蒙古</span> <img
+									class="animated" alt="" th:src="@{/img/web/ewm.jpg}" />
+							</section>
+						</div>
+					</div>
+				</div>
+			</li>
+			<li class="col-md-6 col-12">
+				<h6 class="footTitle">鼎芯科技集团</h6>
+				<ol class=" con">
+					<li class="row">
+						<p class="col-6">
+							电话:<span>0756-3313916</span>
+						</p>
+						<p class="col-6">
+							邮箱:<span>CONTACT@D- CHIP.COM</span>
+						</p>
+					</li>
+					<li class="row">
+						<p class="col-12">
+							地址:<span>珠海市高新区唐家湾镇金唐路1号港湾1号巷2栋101</span>
+						</p>
+					</li>
+					<li class="row">
+						<p class="col-12">
+							地址:<span>内蒙古乌兰察布市集宁新区鼎芯科技大厦</span>
+						</p>
+					</li>
+					<li class="row">
+						<p class="col-12">
+							地址:<span>北京市朝阳区望京西路40号乌兰大厦第四层</span>
+						</p>
+					</li>
+				</ol>
+			</li>
+		</ul>
+	</div>
+	<p class="text text-center">版权由 © 2013-2018 鼎芯科技集团 粤ICP备14021396号</p>
+</footer>
+
+</html>

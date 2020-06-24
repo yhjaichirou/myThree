@@ -1,0 +1,268 @@
+
+   <div class="layui-fluid">   
+    <div class="layui-card">
+      <!-- <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+        <div class="layui-form-item">
+          <div class="layui-inline">
+            角色筛选
+          </div>
+          <div class="layui-inline">
+            <select name="rolename" lay-filter="rolename">
+                <option value="-1">全部角色</option>
+            	<option th:value="${role.id}" th:each="role,infoStat : ${roles}" th:text="${role.roleName}"></option>
+            </select>
+          </div>
+        </div>
+      </div> -->
+      <div class="layui-card-body">
+      
+      	<table class="layui-table" id="LAY-user-back-role" lay-filter="LAY-user-back-role">
+
+		</table>
+      
+      		<script type="text/html" id="toolbarDemo">
+                    <div class="layui-btn-container">
+  					
+    				 <button class="layui-btn layui-btn-sm layuiadmin-btn-role" lay-event="add">新增</button>
+  					</div>
+			</script>		
+      	<!--   <button class="layui-btn layui-btn-sm layuiadmin-btn-role" lay-event="batchdel" id="batchdel">删除</button>-->
+       
+        <script type="text/html" id="buttonTpl">
+          {{#  if(d.check == true){ }}
+            <button class="layui-btn layui-btn-xs">已审核</button>
+          {{#  } else { }}
+            <button class="layui-btn layui-btn-primary layui-btn-xs">未审核</button>
+          {{#  } }}
+        </script>
+        <script type="text/html" id="table-useradmin-admin">
+          <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+          
+        </script>
+        <!-- <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a> -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+  layui.use(['table',"form"], function(){
+    var $ = layui.$
+    ,form = layui.form
+    ,table = layui.table;
+	var currPageUrl = "/index/";
+	
+    //搜索角色
+/*     form.on('select(LAY-user-adminrole-type)', function(data){
+      //执行重载
+      table.reload('LAY-user-back-role', {
+        where: {
+          role: data.value
+        }
+      });
+    }); */
+	
+    function delTarget(ids){
+		 layer.confirm('确定删除么', function(index){
+		      layer.close(index);
+		      //向服务端发送删除指令
+		     $.post(contextPath+currPageUrl+"role/del",{"ids":JSON.stringify(ids)},function(rt){
+      		  if(rt.code==200){
+      	          table.reload('LAY-user-back-role');
+      	          layer.msg('已删除');
+      		  }else{
+					layer_msg(4,rt.msg);
+				}
+      	    });
+		 }); 
+	}
+
+    
+    //执行toolbar事件
+	 table.on('toolbar(LAY-user-back-role)', function(obj){ //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+		  var layEvent = obj.event; 
+		  //active[layEvent].call(this);
+		  if(layEvent === 'add'){ //查看
+			  addOrUpdate();
+		  } else if(layEvent === 'batchdel'){ //删除
+			  var checkStatus = table.checkStatus('LAY-user-back-role')
+		        ,checkData = checkStatus.data; //得到选中的数据
+		        if(checkData.length === 0){
+		          return layer.msg('请选择数据');
+		        }
+		        var arr = [];
+			      for(column of checkStatus.data ){
+			    	  arr.push(column.id);
+			      }
+				delTarget(arr);
+		  }
+		  
+	});
+	//监听行工具事件
+	  table.on('tool(LAY-user-back-role)', function(obj){
+	    var data = obj.data;
+	    if(obj.event === 'del'){
+	    	 delTarget([data.id]);
+	    } else if(obj.event === 'edit'){
+	    	addOrUpdate(data);
+	    	 //active.add(data);
+	    }
+	  });
+    render();
+    function render(search){
+		table.render({
+		    elem: '#LAY-user-back-role'
+		    ,url:contextPath+currPageUrl+'role/getRoles'
+		    ,toolbar: '#toolbarDemo'
+		    ,page:true
+		    ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+		    ,where:{
+		    	enterId:search
+		    }
+		    ,cols: [
+		    	[
+		 		{title: '序号',width:80,templet: '#xuhao'}
+		      ,{field:'roleName',  width:170 ,title: '角色名称'}
+		      ,{field:'primarys', title: '拥有的权限',templet:function(res){
+		    	  var html= ``;
+		    	  var arr = new Array();
+		    	 $.each(res.primarys,function(k,v){
+		    		  arr.push(v.remark);
+		    	  });
+		    	 html = arr.join("；");
+		    	  return html;
+		      }}
+		      ,{field:'roleDescribe', title: '描述'}
+		      ,{fixed: 'right', title:'操作', toolbar: '#table-useradmin-admin', width:150}
+		    	]
+		    ],
+		    parseData:function(res){
+		    	 
+		    },
+		    request: {
+		        pageName: 'page' //页码的参数名称，默认：page
+		        ,limitName: 'limit' //每页数据量的参数名，默认：limit
+		    },
+		    //完成回调
+		     done:function(res,curr1,count){
+				  
+		    } 
+		  });
+	}
+
+  //监听提交
+    form.on('submit(submit)', submit);
+    function submit(data){
+    	//防止重复提交
+    	/* if($(".submit").hasClass("layui-btn-disabled")){
+    		return false;
+    	}
+    	$(".submit").addClass("layui-btn-disabled").html("提交中..."); */
+    	var role = {};
+    	console.log(data.field);
+    	var con = $("#addForm").find("input[name='rolePrimary']:checked"),ids = '',r = [].slice.call(con);
+    	for (var i = 0; i < r.length; i++) {
+    		if (r[i].checked) {
+    			ids+= "," + r[i].value;
+    		}
+    	}
+    	ids = ids.substring(1);
+    	role.id = data.field.id;
+    	role.rolePrimary = ids;
+    	role.roleDescribe = data.field.roleDescribe;
+    	role.roleName = data.field.roleName;
+    	$.ajax({
+			url:contextPath+currPageUrl+"role/addorupdate",
+			type:"POST",
+			data:role,
+			success:function(data){
+				console.log(data);
+				if(data.code ==200){
+					layer.closeAll();
+					table.reload("LAY-user-back-role"); //表格重载
+					layer.msg('已完成');
+				}
+				else{
+					layer_msg(4,data.msg);
+					//$(".submit").removeClass("layui-btn-disabled").html("立即提交");
+				}
+			},
+			error:function(){
+				//$(".submit").removeClass("layui-btn-disabled").html("立即提交");
+			}
+		});
+        return false;
+    }
+  //增加或修改
+	function addOrUpdate(data){
+		layer_open("",["50%","80%"],data==null?"新增":"修改",addOrUphtml(data),function(){
+			var bol = data==null?false:true;
+			var param = {},html="";
+			if(data!=null){
+				param = {"id":data.id}//指标id
+			}
+			 $.post(contextPath+currPageUrl+'role/getPrimarys',param,function(rt){
+					$.each(rt,function(k,v){
+						var checked = "";
+						if(bol){
+							$.each(data.primarys,function(k2,v2){
+								if(v2.id === v.id){
+									checked = "checked='checked'";
+								}
+							})
+						}
+						html += `<input type="checkbox" name="rolePrimary" ${checked} value="${v.id}" lay-skin="primary" title="${v.remark}">`;	
+					});
+					console.log(html);
+					$(".getPrimarys").append(html);
+					form.render();
+			});
+			 //赋值
+			 if(bol){
+				 $("textarea[name='roleDescribe']").val(data.roleDescribe);
+				 $("input[name='roleName']").val(data.roleName);
+				 $("input[name='id']").val(data.id);
+			 }
+			 
+			 $("#back").click(function(){
+				 layer.closeAll();
+			 })
+				 
+			
+		 });
+	}
+  function addOrUphtml(data){
+	  return `
+	  <form class="layui-form addForm" id="addForm" action="" lay-filter="addForm" style="padding:20px;height:93%;">
+	  <div class="layui-form" lay-filter="layuiadmin-form-role" id="layuiadmin-form-role" style="padding: 20px 30px 0 0;">
+	  <div class="layui-form-item">
+	    <label class="layui-form-label">角色名称</label>
+	    <div class="layui-input-block">
+	      <input type="text" name="roleName" lay-verify="required" autocomplete="off" placeholder="请输入角色名称" class="layui-input" maxlength="18">
+	    </div>
+	  </div>
+	    
+	    <div class="layui-form-item">
+	      <label class="layui-form-label">权限范围</label>
+	      <div class="layui-input-block getPrimarys">
+	      	
+	      </div>
+	    </div>
+	    <div class="layui-form-item">
+	      <label class="layui-form-label">具体描述</label>
+	      <div class="layui-input-block">
+	        <textarea type="text" name="roleDescribe" lay-verify="required" autocomplete="off" class="layui-textarea"></textarea>
+	      </div>
+	    </div>
+	  </div>
+	  <input type="text" name="id" value="" hidden="hidden">
+	  <div class="" style="width:100%;text-align:center;position: absolute;bottom: 40px;left:0px">
+		<button  class="layui-btn submit" lay-submit="" lay-filter="submit">立即提交</button>
+		<button type="button" id="back" class="layui-btn layui-btn-primary">返回</button>
+	</div>
+	  </form>
+	  `;
+  }
+
+  });
+  </script>
+

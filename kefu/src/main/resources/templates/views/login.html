@@ -1,0 +1,417 @@
+
+<!DOCTYPE html>
+<html>
+<head xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<title th:text="客服"></title>
+<meta name="renderer" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<link rel="icon" th:href="@{/image/logo2.png}">
+<link th:href="@{/layuiadmin/layui/css/layui.css}" rel="stylesheet"
+	media="all">
+<link th:href="@{/layuiadmin/style/admin.css}" rel="stylesheet"
+	media="all">
+<link th:href="@{/layuiadmin/style/login.css}" rel="stylesheet"
+	media="all">
+</head>
+<style>
+.forget_list{
+margin:20px 0px 0px 20%;
+}
+.forget_list strong{
+ width:70px;
+ text-align:right;
+}
+.send{
+border: 1px solid #7ba554;cursor:pointer;margin-left: 10px;background: #6abc1d;color: white;border-radius: 10px;padding: 4px 10px;display: inline-block;
+}
+.send:hover{
+background-color:#6abc1d;
+}
+.hidden{
+	visibility: hidden;
+	opacity:0;
+	display:none;
+}
+</style>
+<body>
+
+	<div class="layadmin-user-login layadmin-user-display-show"
+		id="LAY-user-login" style="display: none;">
+
+		<div class="layadmin-user-login-main">
+			<div class="layadmin-user-login-box layadmin-user-login-header">
+				<h2 style="color:#0e83ea;font-weight:bold">政企客服服务中心</h2>
+				<p style="color:white">(相关说明)</p>
+			</div>
+			<div
+				class="layadmin-user-login-box layadmin-user-login-body layui-form">
+				<div class="layui-form-item">
+					<label
+						class="layadmin-user-login-icon layui-icon layui-icon-username"
+						for="LAY-user-login-username"></label> <input type="text"
+						name="userName" id="LAY-user-login-username" lay-verify="required" maxlength="11"
+						placeholder="请输入用户名" class="layui-input">
+				</div>
+				<div class="layui-form-item">
+					<label
+						class="layadmin-user-login-icon layui-icon layui-icon-password"
+						for="LAY-user-login-password"></label> <input type="password"
+						name="password" id="LAY-user-login-password" lay-verify="required"
+						placeholder="密码" class="layui-input">
+				</div>
+			<!-- 	<div class="layui-form-item">
+					<div class="layui-row">
+						<div class="layui-col-xs7">
+							<label
+								class="layadmin-user-login-icon layui-icon layui-icon-vercode"
+								for="LAY-user-login-vercode"></label> <input type="text"
+								name="vercode" id="LAY-user-login-vercode" lay-verify="required"
+								placeholder="图形验证码" class="layui-input" maxlength="4">
+						</div>
+						<div class="layui-col-xs5">
+							<div style="margin-left: 10px;">
+								<img th:src="@{https://www.oschina.net/action/user/captcha}" src="" class="layadmin-user-login-codeimg" id="LAY-user-get-vercode">
+								<canvas id="canvas" width="130" height="38"
+									style="cursor: pointer;background-color: white;" ></canvas>
+							</div>
+						</div>
+					</div>
+				</div> -->
+				
+				<div class="layui-form-item loginType hidden" style="transition:all .3s;">
+					<div class="layui-input-block" style="margin-left: 0px;">
+				      <select name="loginType" lay-filter="loginType" >
+				        <option value="">请选择后台入口</option>
+				      </select>
+				    </div>
+				</div>
+				
+				
+				
+				<div class="layui-form-item" style="margin-bottom: 20px;">
+					<input type="checkbox" name="remember" lay-skin="primary"
+						class="remember" title="记住密码">
+						<!--  <a  href="#" class="layadmin-user-jump-change layadmin-link forget" style="margin-top: 7px;">忘记密码？</a> -->
+				</div>
+				<div class="layui-form-item">
+					<button class="layui-btn layui-btn-fluid submit" lay-submit
+						lay-filter="LAY-user-login-submit">登 入</button>
+				</div>
+				<!-- <div class="layui-trans layui-form-item layadmin-user-login-other">
+					<label>社交账号登入</label> <a href="javascript:;"><i
+						class="layui-icon layui-icon-login-qq"></i></a> <a href="javascript:;"><i
+						class="layui-icon layui-icon-login-wechat"></i></a> <a
+						href="javascript:;"><i
+						class="layui-icon layui-icon-login-weibo"></i></a> <a href="reg.html"
+						class="layadmin-user-jump-change layadmin-link">注册帐号</a>
+				</div> -->
+			</div>
+		</div>
+
+		<div class="layui-trans layadmin-user-login-footer">
+
+			<p>
+				© 2020 <a href="http://www.layui.com/" target="_blank">猫咪信息科技公司</a>
+			</p>
+			<p>
+			<!-- 	<span><a href="#" target="_blank">党委组织</a></span> <span><a
+					href="#" target="_blank">问题反馈</a></span> <span><a href="#"
+					target="_blank">客服帮助</a></span> -->
+			</p>
+		</div>
+
+		<!--<div class="ladmin-user-login-theme">
+      <script type="text/html" template>
+        <ul>
+          <li data-theme=""><img src="{{ layui.setter.base }}style/res/bg-none.jpg"></li>
+          <li data-theme="#03152A" style="background-color: #03152A;"></li>
+          <li data-theme="#2E241B" style="background-color: #2E241B;"></li>
+          <li data-theme="#50314F" style="background-color: #50314F;"></li>
+          <li data-theme="#344058" style="background-color: #344058;"></li>
+          <li data-theme="#20222A" style="background-color: #20222A;"></li>
+        </ul>
+      </script>
+    </div>-->
+
+	</div>
+	<script th:src="@{/common/jquery-3.3.1-min.js}" src=""></script>
+	<script th:src="@{/layuiadmin/layui/layui.js}" src=""></script>
+	<script th:inline="javascript" type="text/javascript">
+  contextPath =  [[${#request.getContextPath()}]];
+  layui.config({
+    base: contextPath+"/layuiadmin/" //静态资源所在路径   --全局配置
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index', 'user',"base64"], function(){ 
+	
+    var $ = layui.$
+    ,setter = layui.setter
+    ,admin = layui.admin
+	,form = layui.form
+    ,router = layui.router()
+    ,search = router.search
+    ,Base64 = layui.base64;
+
+    form.render();
+	
+	
+    
+	/* 记住密码  */
+	//1.localStorage
+	//判断是否有，有的话，取第一个
+	if (window.localStorage) {
+		if (window.localStorage.getItem("checkFlag") == "true") {
+			if(window.localStorage.getItem(Base64.encode("userName"))==null||window.localStorage.getItem(Base64.encode("password"))==null){
+				localStorage.setItem("checkFlag", "false");
+				localStorage.removeItem(Base64.encode("userName"));
+				localStorage.removeItem(Base64.encode("password"));
+			}else{
+				$("#LAY-user-login-username").val(Base64.decode(window.localStorage.getItem(Base64.encode("userName"))));
+				$("#LAY-user-login-password").val(Base64.decode(window.localStorage.getItem(Base64.encode("password"))));
+				$(".remember").prop('checked', true);
+			}
+		} else {
+			$(".remember").prop('checked', false);
+		}
+		 form.render();
+	}else{
+		$(".remember").attr("disabled","disabled");
+		 form.render();
+		/* $(".rem_msg").html("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"); */
+	}
+	//“记住密码”监听事件
+	$(".remember").change(function () {
+		//判断是否勾选
+		var checkFlag = $(this).prop('checked');
+		if (checkFlag) { //勾选状态下
+			if (!window.localStorage) { //浏览器不支持记住密码这个功能，弹出提示信息，清除勾选状态
+				/* $(".rem_msg").html("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"); */
+			}
+		}
+	});
+	
+	// 忘记密码
+	$(".forget").click(function(){
+			var html = `
+						<div class="forget_list">
+						  <strong><label>身份证号：</label></strong>
+						  <div class="layui-inline" style="display: inline-block;">
+						    <input class="layui-input" id="name" style="border: 1px solid #e6e6e6;">
+						  </div>
+						</div>
+						<div  class="forget_list">
+						  <strong><label>姓名：</label></strong>
+						  <div class="layui-inline" style="display: inline-block;">
+						    <input class="layui-input" id="name" style="border: 1px solid #e6e6e6;">
+						  </div>
+						</div>
+						<div class="forget_list"">
+						  <strong><label>手机号：</label></strong>
+						  <div class="layui-inline" style="display: inline-block;">
+						    <input class="layui-input" id="phone” style="border: 1px solid #e6e6e6;">
+						  </div>
+						</div>
+						<div class="forget_list"">
+						  <strong><label>验证码：</label></strong>
+						  <div class="layui-inline" style="display: inline-block;">
+						    <input class="layui-input" id="vercode" style="border: 1px solid #e6e6e6;">
+						  </div>
+						  <div class="layui-inline" >
+						    <botton class="layui-button send"  style="">获取验证码</button>
+						  </div>
+						</div>
+						
+						
+						`;
+			layer.open({
+			  title:"高级验证",
+			  type: 1,
+			  area: ['500px', '400px'],
+			  fixed: true, // 固定
+			  maxmin: true,
+			  content: html,
+			  btn:["确定"],
+			  btnAlign: 'c',
+			  anim: 1,
+			  yes: function(index, layero){
+				    // 按钮【按钮一】的回调
+				  console.log(index);
+				  var phone = $("#phone").val();
+				  
+				  $.ajax({
+					  url: contextPath+"/admin/seniorValidate",
+					  dataType:'json',
+					  type:'post',
+					  data : {
+						  phone : phone
+						},
+					  complete: function(XHR, TS){
+						  var returnObj = eval('(' + XHR.responseText + ')');
+						  if(returnObj.code != 200){
+							  layer.msg(returnObj.msg,{icon:5,anim:6,time:1500}); 
+						  }else{
+							  layer.msg(returnObj.msg, {
+								  icon: 1,
+								  time: 10000 // 10秒自动关闭（
+								}, function(){
+									
+							  }); 
+						  }
+					  }
+				});
+				  
+					
+			  }
+			});
+		});
+	
+	
+	
+	// 回车提交
+	$(document).keydown(function(e) {
+		if (e.keyCode == 13) {//空格 32
+			$(".submit").click();
+		}
+	});
+
+
+    //提交
+    form.on('submit(LAY-user-login-submit)', function(obj){
+    	
+    	//验证码验证
+    /* 	if(show_num.join("")!=obj.field.vercode.toLocaleLowerCase()){
+    		 layer.msg("验证码错误",{icon:5,anim:6,time:1500}); 
+    		draw(show_num);
+    		return ;
+    	} */
+       $.ajax({
+    	  url: contextPath + '/admin/loginIn' //实际使用请改成服务端真实接口
+          ,data: obj.field
+         	,type:"post"
+         	,complete: function(XHR, TS){
+				  var returnObj = eval('(' + XHR.responseText + ')');
+				  console.log(returnObj)
+				  if(returnObj.code != 200){
+					  layer.msg(returnObj.msg,{icon:5,anim:6,time:1500}); 
+					  draw(show_num);
+				  }else{
+					  var checkFlag = $(".remember").prop('checked');
+					  if (checkFlag) {//勾选状态下，需要修改或新增]
+							localStorage.setItem("checkFlag", "true");
+							var name = obj.field.userName;
+							var pwd = obj.field.password+"";
+							localStorage.setItem(Base64.encode("userName"), Base64.encode(obj.field.userName+""));
+							localStorage.setItem(Base64.encode("password"), Base64.encode(obj.field.password+""));
+					  } else {
+							if (localStorage.getItem(Base64.encode("userName"))) {
+								localStorage.setItem("checkFlag", "false");
+								localStorage.removeItem(Base64.encode("userName"));
+								localStorage.removeItem(Base64.encode("password"));
+							}
+					  }
+					  form.render();
+					window.location.href = contextPath+returnObj.returnUrl+"/init";
+				  }
+         	},
+         	error:function(){
+         		draw(show_num);
+         	}
+      }); 
+    	
+    });
+    
+     /*  //请求登入接口
+      admin.req({
+        url: contextPath + '/admin/loginIn' //实际使用请改成服务端真实接口
+        ,data: obj.field
+       	,type:"post"
+        ,done: function(res){
+        
+          //请求成功后，写入 access_token
+          layui.data(setter.tableName, {
+            key: setter.request.tokenName
+            ,value: res.data.access_token
+          });
+          
+          //登入成功的提示与跳转
+          layer.msg('登入成功', {
+            offset: '15px'
+            ,icon: 1
+            ,time: 1000
+          }, function(){
+            location.href = '../'; //后台主页
+          });
+        }
+      }); */
+      
+   
+    
+    
+	    //验证码
+	    var show_num = [];
+	    draw(show_num);
+	    $("#canvas").on('click',function(){
+	        draw(show_num);
+	    })
+	    function draw(show_num) {
+	        var canvas_width=$('#canvas').width();
+	        var canvas_height=$('#canvas').height();
+	        var canvas = document.getElementById("canvas");//获取到canvas的对象，演员
+	        var context = canvas.getContext("2d");//获取到canvas画图的环境，演员表演的舞台
+	        canvas.width = canvas_width;
+	        canvas.height = canvas_height;
+	        var sCode = "A,B,C,E,F,G,H,J,K,L,M,N,P,Q,R,S,T,W,X,Y,Z,1,2,3,4,5,6,7,8,9,0";
+	        var aCode = sCode.split(",");
+	        var aLength = aCode.length;//获取到数组的长度
+	        
+	        for (var i = 0; i <= 3; i++) {
+	            var j = Math.floor(Math.random() * aLength);//获取到随机的索引值
+	            var deg = Math.random() * 30 * Math.PI / 180;//产生0~30之间的随机弧度
+	            var txt = aCode[j];//得到随机的一个内容
+	            show_num[i] = txt.toLowerCase();
+	            var x = 10 + i * 20;//文字在canvas上的x坐标
+	            var y = 20 + Math.random() * 8;//文字在canvas上的y坐标
+	            context.font = "bold 23px 微软雅黑";
+	 
+	            context.translate(x, y);
+	            context.rotate(deg);
+	 
+	            context.fillStyle = randomColor();
+	            context.fillText(txt, 0, 0);
+	 
+	            context.rotate(-deg);
+	            context.translate(-x, -y);
+	        }
+	        for (var i = 0; i <= 5; i++) { //验证码上显示线条
+	            context.strokeStyle = randomColor();
+	            context.beginPath();
+	            context.moveTo(Math.random() * canvas_width, Math.random() * canvas_height);
+	            context.lineTo(Math.random() * canvas_width, Math.random() * canvas_height);
+	            context.stroke();
+	        }
+	        for (var i = 0; i <= 30; i++) { //验证码上显示小点
+	            context.strokeStyle = randomColor();
+	            context.beginPath();
+	            var x = Math.random() * canvas_width;
+	            var y = Math.random() * canvas_height;
+	            context.moveTo(x, y);
+	            context.lineTo(x + 1, y + 1);
+	            context.stroke();
+	        }
+	        
+	    }
+	 
+	    function randomColor() {//得到随机的颜色值
+	        var r = Math.floor(Math.random() * 256);
+	        var g = Math.floor(Math.random() * 256);
+	        var b = Math.floor(Math.random() * 256);
+	        return "rgb(" + r + "," + g + "," + b + ")";
+	    }
+	
+  });
+  </script>
+</body>
+</html>

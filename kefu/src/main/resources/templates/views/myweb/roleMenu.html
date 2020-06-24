@@ -1,0 +1,272 @@
+<style  type="text/css">
+	.layui-btn-sm{
+	height: 20px;
+line-height: 20px;
+padding: 0 8px;
+font-size: 11px;
+	}
+	#tree{
+		margin-left: 80px;
+	}
+</style>
+   <div class="layui-fluid">   
+    <div class="layui-card">
+      <div class="layui-card-body">
+      	<table class="layui-table" id="LAY-user-back-role" lay-filter="LAY-user-back-role">
+		</table>
+        <script type="text/html" id="table-useradmin-admin">
+          <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>分配菜单</a>
+        </script>
+      </div>
+    </div>
+  </div>
+
+  <script th:inline="javascript" type="text/javascript">
+  navList = [[${#request.getAttribute('allMenus')}]];
+  layui.use(['table',"form","tree","util"], function(){
+    var $ = layui.$
+    ,tree = layui.tree
+    ,form = layui.form
+    ,table = layui.table
+    ,util = layui.util;
+	var currPageUrl = "/index/";
+	var TreeArr = [];
+
+
+	//监听行工具事件
+	  table.on('tool(LAY-user-back-role)', function(obj){
+	    var data = obj.data;
+	    if(obj.event === 'edit'){
+	    	addOrUpdate(data);
+	    }
+	  });
+	
+	
+	
+    render();
+    function render(search){
+		table.render({
+		    elem: '#LAY-user-back-role'
+		    ,url:contextPath+currPageUrl+'role/getMenus'
+		    //,toolbar: '#toolbarDemo'
+		    ,page:true
+		    ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+		    ,where:{
+		    	enterId:search
+		    }
+		    ,cols: [
+		    	[
+		    	{title: '序号',width:80,templet: '#xuhao'}
+		      ,{field:'roleName',  width:170 ,title: '角色名称'}
+		      ,{field:'menus', title: '拥有的菜单',templet:function(res){
+		    	  var html= ``;
+		    	  var arr = new Array();
+		    	  console.log(res);
+		    	  $.each(res.menus,function(k,v){
+		    		  arr.push(v.name);
+		    	  });
+		    	  html = arr.join("；");
+		    	  return html;
+		    	 /*  return `
+		    	  <div id="tree_${res.id}" class="demo-tree demo-tree-box">ss</div>
+		    	  `; */
+		      }}
+		      ,{fixed: 'right', title:'操作', toolbar: '#table-useradmin-admin', width:150}
+		    	]
+		    ],
+		    parseData:function(res){
+		    	 
+		    },
+		    request: {
+		        pageName: 'page' //页码的参数名称，默认：page
+		        ,limitName: 'limit' //每页数据量的参数名，默认：limit
+		    },
+		    //完成回调
+		     done:function(res,curr1,count){
+		    		/* var tableElem = this.elem.next('.layui-table-view');
+		             layui.each(tableElem.find('.demo-tree-box'), function (index, item) {
+		                    var elem = $(item);
+		                    $(elem).parents('div.layui-table-cell').addClass("layui-table-cell-vis");
+		             });
+		             form.render(); */
+		    	// 树形图
+		    /*	$.each(res.data,function(k,v){
+		    		tree.render({
+				   	    elem: '#tree_'+v.id
+				   	    ,data: navList
+				   	    ,showCheckbox:true
+				   	    ,edit: [] //操作节点的图标
+				   	    ,click: function(obj){
+				   	    	 var data = obj.data; //得到当前节点的数据
+				   	    	 //获取内容
+				   	    	 getDetail(data);
+				   	    },
+					   	 oncheck: function(obj){
+					   	    //console.log(obj.data); //得到当前点击的节点数据
+					   	    //console.log(obj.checked); //得到当前节点的展开状态：open、close、normal
+					   	   // console.log(obj.elem); //得到当前节点元素 
+					   	  },
+				   	    operate: function(obj){
+				   	    	console.log(obj);
+				   	        var type = obj.type; //得到操作类型：add、edit、del
+				   	        var data = obj.data; //得到当前节点的数据
+				   	        var elem = obj.elem; //得到当前节点元素
+				   	    
+				   	        //Ajax 操作
+				   	        if(type === 'add'){ //增加节点
+				   	        }  else if(type === 'del'){ //删除节点	
+				   	        };
+				   	      }
+				   	  }); //tree end
+			    	})*/
+				   	  
+		    } 
+		  });
+	}
+
+  //监听提交
+    form.on('submit(submit)', submit);
+    function submit(data){
+    	//防止重复提交
+    	/* if($(".submit").hasClass("layui-btn-disabled")){
+    		return false;
+    	}
+    	$(".submit").addClass("layui-btn-disabled").html("提交中..."); */
+    	var checkedData = tree.getChecked('demoId1'); //获取选中节点的数据
+    	$.ajax({
+			url:contextPath+currPageUrl+"role/addRoleMenus",
+			type:"POST",
+			data:{"id":data.field.id,"menuIds":JSON.stringify(checkedData)},
+			success:function(data){
+				if(data.code ==200){
+					layer.closeAll();
+					table.reload("LAY-user-back-role"); //表格重载
+					layer.msg('已完成');
+				}
+				else{
+					layer_msg(4,data.msg);
+					//$(".submit").removeClass("layui-btn-disabled").html("立即提交");
+				}
+			},
+			error:function(){
+				//$(".submit").removeClass("layui-btn-disabled").html("立即提交");
+			}
+		});
+        return false;
+    }
+  //增加或修改
+	function addOrUpdate(data){
+		layer_open("",["40%","80%"],"分配菜单",addOrUphtml(data),function(){
+			TreeArr = [];
+			var bol = data==null?false:true;
+			var param = {},html="";
+			if(data!=null){
+				param = {"id":data.id}//指标id
+			}
+			 $.post(contextPath+currPageUrl+'role/getMenusTree',param,function(rt){
+				$.each(rt.allMenus,function(k,v){
+					TreeArr.push(v.id);
+				});
+				
+				console.log("树形");
+				console.log(TreeArr);
+				tree.render({
+				   	    elem: '#tree'
+				   	    ,data: rt.allMenus
+				   	    ,showCheckbox:true
+				   	    ,id: 'demoId1'
+				   	    ,edit: [] //操作节点的图标
+				   	    ,click: function(obj){
+				   	    	 var data = obj.data; //得到当前节点的数据
+				   	    	 //获取内容
+				   	    	 //getDetail(data);
+				   	    },
+					   	 oncheck: function(obj){
+					   	    console.log(obj.data); //得到当前点击的节点数据
+					   	    console.log(obj.checked); //得到当前节点的展开状态：open、close、normal
+					   	    console.log(obj.elem); //得到当前节点元素
+					   	    
+					   	  },
+				   	    operate: function(obj){
+				   	    	console.log(obj);
+				   	        var type = obj.type; //得到操作类型：add、edit、del
+				   	        var data = obj.data; //得到当前节点的数据
+				   	        var elem = obj.elem; //得到当前节点元素
+				   	    
+				   	        //Ajax 操作
+				   	        if(type === 'add'){ //增加节点
+				   	        }  else if(type === 'del'){ //删除节点	
+				   	        };
+				   	      }
+				}); //tree end
+				
+				/* 设置选中  */
+				 var bangMenu = [];
+				 $.each(rt.bangMenus,function(k,v){
+				   		bangMenu.push(Number(v.menuId));
+				 }); 
+				 //因为目前首页下无子类  ，但要选中 
+				 bangMenu.push(1);
+				 
+				 console.log("设置选中");
+				 console.log(bangMenu);
+				 tree.setChecked('demoId1', bangMenu); //勾选指定节点	   	  
+			});
+			 $("#back").click(function(){
+				 layer.closeAll();
+			 })
+			
+		 });
+	}
+  function addOrUphtml(data){
+	  return `
+	  <form class="layui-form addForm" id="addForm" action="" lay-filter="addForm" style="padding:20px;height:auto;">
+	  <div class="layui-form" lay-filter="layuiadmin-form-role" id="layuiadmin-form-role" >
+	  <div class="layui-form-item">
+	    <label class="layui-form-label">角色名称:</label>
+	    <div class="layui-input-block">
+	      	<p style="line-height: 38px;">${data.roleName}</p>
+	    </div>
+	  </div>
+	    
+	    <div class="layui-form-item">
+	      <label class="layui-form-label">权限范围</label>
+	    <div class="layui-btn-container" style="line-height: 50px;">
+/* 	      <button type="button" class="layui-btn layui-btn-sm" lay-demo="getChecked">获取选中节点数据</button> */
+	      <button type="button" class="layui-btn layui-btn-sm"  lay-demo="setAllChecked">全选</button>
+	      <button type="button" class="layui-btn layui-btn-sm" lay-demo="reload">重载实例</button>
+	    </div>
+	     
+	      <div id="tree" class="demo-tree demo-tree-box"></div>
+	    </div>
+	    
+	  </div>
+	  <input type="text" name="id" value="${data.id}" hidden="hidden">
+	  <div class="" style="text-align: center;">
+		<button  class="layui-btn submit" lay-submit="" lay-filter="submit">立即提交</button>
+		<button type="button" id="back" class="layui-btn layui-btn-primary">返回</button>
+	</div>
+	  </form>
+	  `;
+  }
+  
+	//按钮事件
+  util.event('lay-demo', {
+ /*    getChecked: function(othis){
+      var checkedData = tree.getChecked('demoId1'); //获取选中节点的数据
+      layer.alert(JSON.stringify(checkedData), {shade:0});
+    }, */
+    setAllChecked: function(){
+      tree.setChecked('demoId1', TreeArr); //勾选指定节点
+    }
+    ,reload: function(){
+      //重载实例
+      tree.reload('demoId1', {
+        
+      });
+    }
+  });
+
+  });
+  </script>
+

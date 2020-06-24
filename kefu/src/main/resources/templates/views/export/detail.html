@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="template::cmsHeader(后台用户管理)"></head>
+<style>
+.bold{
+	font-weight:bold;
+}
+</style>
+<body>
+
+	<div style="padding:30px;">
+	
+	<div class="layui-row  layui-col-space15">
+		<div class="layui-col-md12">
+			<div class="layui-card">
+			          <div class="layui-card-header">个人信息</div>
+			          <div class="layui-card-body layadmin-takerates">
+							 <table class="layui-table">
+				              <colgroup>
+				                <col width="100">
+				                <col width="100">
+				                <col width="100">
+				                <col width="100">
+				              </colgroup>
+				              <tbody>
+				                <tr>
+				                  <td class="bold">姓名</td>
+				                  <td>一一年</td>
+				                  <td class="bold">性别</td>
+				                  <td>男</td>
+				                  <td class="bold">电话</td>
+				                  <td>18648484848</td>
+				                  <td class="bold">身份证</td>
+				                  <td>男</td>
+				                </tr>
+				                <tr>
+				                   <td class="bold">身高</td>
+				                  <td>156cm一一年</td>
+				                  <td class="bold">民族</td>
+				                  <td>男</td>
+				                  <td class="bold">出生年月</td>
+				                  <td>18648484848</td>
+				                  <td class="bold">户籍所在地</td>
+				                  <td>男</td>
+				                </tr>
+				                <tr>
+					                 
+				                </tr>
+				                <tr>
+				                  <td>获取渠道</td>
+				                  <td style="padding-bottom: 0;">
+				                    <div class="layui-btn-container">
+				                      <a href="http://www.layui.com/admin/" target="_blank" class="layui-btn layui-btn-danger"></a>
+				                      <a href="http://fly.layui.com/download/layuiAdmin/" target="_blank" class="layui-btn">立即下载</a>
+				                    </div>
+				                  </td>
+				                </tr>
+				              </tbody>
+				            </table>
+			          </div>
+			 </div>
+		  </div>
+		  
+		  <div class="layui-col-md12">
+			<div class="layui-card">
+			          <div class="layui-card-header">实时监控</div>
+			          <div class="layui-card-body layadmin-takerates">
+							<ul class="layui-row layuiadmin-card-team">
+					              <li class="layui-col-xs6">
+					                <a lay-href="https://www.layui.com/doc/modules/table.html">
+					                  <span class="layui-team-img"><img src="../../layuiadmin/style/res/logo.png"></span> 
+					                  <span>数据表格</span>
+					                </a>
+					              </li>
+					              <li class="layui-col-xs6">
+					                <a lay-href="https://www.layui.com/doc/modules/layim.html">
+					                  <span class="layui-team-img"><img src="../../layuiadmin/style/res/logo.png"></span> 
+					                  <span>即时通讯</span>
+					                </a>
+					              </li>
+					              <li class="layui-col-xs6">
+					                <a lay-href="https://www.layui.com/doc/modules/form.html">
+					                  <span class="layui-team-img"><img src="../../layuiadmin/style/res/logo.png"></span> 
+					                  <span>表单</span>
+					                </a>
+					              </li>
+					              <li class="layui-col-xs6">
+					                <a lay-href="https://www.layui.com/doc/modules/layer.html">
+					                  <span class="layui-team-img"><img src="../../layuiadmin/style/res/logo.png"></span> 
+					                  <span>弹出层</span>
+					                </a>
+					              </li>
+					              <li class="layui-col-xs6">
+					                <a lay-href="https://www.layui.com/doc/modules/upload.html">
+					                  <span class="layui-team-img"><img src="../../layuiadmin/style/res/logo.png"></span> 
+					                  <span>文件上传</span>
+					                </a>
+					              </li>
+					              <li class="layui-col-xs6">
+					                <a lay-href="https://www.layui.com/doc/modules/rate.html">
+					                  <span class="layui-team-img"><img src="../../layuiadmin/style/res/logo.png"></span> 
+					                  <span>评分</span>
+					                </a>
+					              </li>
+					        </ul>
+			          </div>
+			 </div>
+		  </div>
+		  
+			<!-- 认证资料 -->		  
+		  <div class="layui-col-md12">
+			<div class="layui-card">
+			          <div class="layui-card-header">实时监控</div>
+			          <div class="layui-card-body layadmin-takerates">
+					      <div class="layui-row layui-col-space30">
+						          <div class="layui-col-md6 layui-col-sm4">
+								        <div class="cmdlist-container">
+								            <a href="javascript:;">
+								              <img src="${#request.getContextPath()+'/'+url}">
+								            </a>
+								            <a href="javascript:;">
+								              <div class="cmdlist-text">
+								                <p class="info">2018春夏季新款港味短款白色T恤+网纱中长款chic半身裙套装两件套</p>
+								                <div class="price">
+								                    <b>￥79</b>
+								                    <p>
+								                      ¥
+								                      <del>130</del>
+								                    </p>
+								                    <span class="flow">
+								                      <i class="layui-icon layui-icon-rate"></i>
+								                      433
+								                    </span>
+								                </div>
+								              </div>
+								            </a>
+								   		</div>
+								   </div>
+						    </div>
+					    </div>  
+							<ul class="layui-row layuiadmin-card-team">
+					              <li class="layui-col-xs6">
+					                <a lay-href="https://www.layui.com/doc/modules/table.html">
+					                  <span class="layui-team-img"><img src="../../layuiadmin/style/res/logo.png"></span> 
+					                  <span>数据表格</span>
+					                </a>
+					              </li>
+					              <li class="layui-col-xs6">
+					                <a lay-href="https://www.layui.com/doc/modules/layim.html">
+					                  <span class="layui-team-img"><img src="../../layuiadmin/style/res/logo.png"></span> 
+					                  <span>即时通讯</span>
+					                </a>
+					              </li>
+					              <li class="layui-col-xs6">
+					                <a lay-href="https://www.layui.com/doc/modules/form.html">
+					                  <span class="layui-team-img"><img src="../../layuiadmin/style/res/logo.png"></span> 
+					                  <span>表单</span>
+					                </a>
+					              </li>
+					              <li class="layui-col-xs6">
+					                <a lay-href="https://www.layui.com/doc/modules/layer.html">
+					                  <span class="layui-team-img"><img src="../../layuiadmin/style/res/logo.png"></span> 
+					                  <span>弹出层</span>
+					                </a>
+					              </li>
+					              <li class="layui-col-xs6">
+					                <a lay-href="https://www.layui.com/doc/modules/upload.html">
+					                  <span class="layui-team-img"><img src="../../layuiadmin/style/res/logo.png"></span> 
+					                  <span>文件上传</span>
+					                </a>
+					              </li>
+					              <li class="layui-col-xs6">
+					                <a lay-href="https://www.layui.com/doc/modules/rate.html">
+					                  <span class="layui-team-img"><img src="../../layuiadmin/style/res/logo.png"></span> 
+					                  <span>评分</span>
+					                </a>
+					              </li>
+					        </ul>
+			          </div>
+			 </div>
+		  </div>
+		  
+		  
+		  
+	</div>
+	
+	</div>
+
+
+</body>
+</html>

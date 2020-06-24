@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head  th:replace="template::cmsHeader(角色管理)"></head>
+<style>
+.tree_content {
+	background-color: white;
+	overflow: hidden;
+	display: inline-block;
+	width: 40%;
+}
+
+#tree {
+	width: 40%;
+	height: auto;
+	padding: 10px 20px 30px 20px;
+	margin-left: 20px;
+	float: left;
+}
+
+#showTreeinfo {
+	width: 60%;
+	height: auto;
+	float: left;
+}
+
+.next_body {
+	transition: all .3s;
+	-webkit-transition: all .3s;
+	position: fixed;
+	top: 150px;
+	bottom: 0;
+}
+</style>
+<body>
+
+  <!-- Loader 加载 html页面 -->
+	<ul class="layui-nav" lay-filter="">
+		<li class="layui-nav-item layui-this"><a href="#"
+			onclick="LoadPage('.con-body','rolePrimary')">角色分配</a></li>
+		<li class="layui-nav-item "><a href="#"
+			onclick="LoadPage('.con-body','roleMenu')">菜单分配</a></li>
+		
+	</ul>
+
+	<div class="con-body">
+
+		
+	</div>
+	<!-- 模板js -->
+	<div th:replace="template::commonJs"></div>
+	<script th:src="@{/layuiadmin/layui/layui.all.js}"></script>
+	<script th:inline="javascript" type="text/javascript">
+		$(function(){
+			$(".layui-this a").click();
+		})
+  </script>
+</body>
+</html>

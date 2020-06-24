@@ -1,0 +1,363 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="template::cmsHeader(后台房间管理)"></head>
+<style>
+.imgTx{
+	width:50px;
+	
+}
+</style>
+<body>
+
+	<div class="layui-fluid">
+		<div class="layui-card">
+
+			<div class="layui-form " style="padding: 20px 10px 10px 10px;">
+				<!-- <div class="layui-form-item" id="area-picker">
+					<label class="layui-form-label" style="width: 30px">省：</label>
+					<div class="layui-input-inline" style="width: 150px;">
+						<select name="province" class="province-selector" data-value="请选择"
+							lay-filter="province-1">
+							<option value="">请选择省</option>
+						</select>
+					</div>
+					<label class="layui-form-label" style="width: 30px">市：</label>
+					<div class="layui-input-inline" style="width: 150px;">
+						<select name="city" class="city-selector" data-value="请选择"
+							lay-filter="city-1">
+							<option value="">请选择市</option>
+						</select>
+					</div>
+					<label class="layui-form-label" style="width: 30px">区：</label>
+					<div class="layui-input-inline" style="width: 150px;">
+						<select name="county" class="county-selector" data-value="请选择"
+							lay-filter="county-1">
+							<option value="">请选择区</option>
+						</select>
+					</div>
+
+				</div> -->
+				<div class="layui-form-item">
+					<label class="layui-form-label" style="width: 120px;text-align: left;">姓名/电话/身份证</label>
+					<div class="layui-input-inline" style="width: 227px">
+							<input type="text" name="search" placeholder="姓名、电话号、身份证"
+								autocomplete="off" class="layui-input"  maxlength="30">
+					</div>
+					
+					<!-- <label class="layui-form-label" style="width: 43px">状态：</label>
+					<div class="layui-input-inline">
+						<select name="auth" lay-filter="auth">
+							<option value="">请选择</option>
+							<option value="3">未认证</option>
+							<option value="4">待认证</option>
+							<option value="6">已认证</option>
+							<option value="5">认证失败</option>
+						</select>
+					</div> -->
+					<label class="layui-form-label" style="width: 43px">类型：</label>
+					<div class="layui-input-inline">
+						<select name="type" lay-filter="type">
+							<option value="">请选择</option>
+							<option value="1">普通</option>
+							<option value="2">VIP</option>
+						</select>
+					</div>
+				</div>
+			</div>
+
+
+			<div class="layui-card-body">
+					<table class="layui-table" id="table" lay-filter="table">
+					</table>
+
+					<script type="text/html" id="toolbarDemo">
+                    	<button class="layui-btn layui-btn-sm" lay-event="add" id="batchdel">增加</button>
+					</script>
+
+					<!-- 	 <button class="layui-btn layui-btn-sm" lay-event="batchdel" id="batchdel">删除</button> -->
+					<script type="text/html" id="barDemo">
+    						<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+					
+				</script>
+
+
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 模板js -->
+	<div th:replace="template::commonJs"></div>
+	<script th:inline="javascript" type="text/javascript">
+	layui.config({
+	    base: contextPath+"/layuiadmin/modules/" 
+  	}).use(['table',"form","rate","element"], function(){
+    var $ = layui.$
+    ,form = layui.form
+    ,table = layui.table
+    ,element = layui.element
+    ,rate = layui.rate 
+    ,currPageUrl = "/export/";
+
+	$("input[name='search']").bind('input propertychange', function() {
+		var inuptvalue = $(this).val();
+		var data = {
+        		search:inuptvalue,
+        		type:$("select[name='type']").val()
+        };
+		 render(data);
+	});
+	form.on("select(type)",function(data){
+		var data = {
+        		search:$("input[name='search']").val(),
+        		//auth:$("select[name='auth']").val(),
+        		type:data.value
+        };
+		 render(data);
+	})
+
+	 function ValidateValue(textbox) {
+			if(textbox == "" ){
+				return true;
+			}
+			var IllegalString = "[`~!#$^&*()=|{}':;',\\[\\].<>/?~！#￥……&*（）——|{}【】‘；：”“'。，、？]‘’";
+			var textboxvalue = textbox;
+			var index = textboxvalue.length - 1;
+			var s = textbox.charAt(index);
+			if (IllegalString.indexOf(s) >= 0) {
+				s = textboxvalue.substring(0, index);
+				textbox.value = s;
+				return false;
+			} else{
+				return true;
+			}
+	} 
+	    
+	render();
+    function render(data){
+    	/* if(!ValidateValue(data.city) || !ValidateValue(data.county) || !ValidateValue(data.province) 
+				|| !ValidateValue(data.search)){
+			layer.msg("错误的搜索值！");
+			return false;
+		} */
+		table.render({
+		    elem: '#table'
+		    ,url:contextPath+currPageUrl+'room/getRoomList'
+		    ,toolbar: '#toolbarDemo'
+		    ,page:true
+		    ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+			,where:data
+		    ,cols: [
+		    	[
+		      {title: '序号',templet: '#xuhao', width:80}
+		      ,{field:'roomName',title: '房间名称',width:180}
+		      ,{field:'roomImg',title: '房间类型',width:180 , templet:function(d){
+		    	  return `<img src="${d.roomImg}"  class="imgTx"/>`;
+		      }} 
+		      ,{field:'roomCode',title: '房间编号',width:180}
+		      ,{field:'roomType',title: '房间类型',width:180, templet:function(d){
+		    	  var kftml = "";
+		    	  if(d.roomType==1){
+		    		  kftml = `<span class="kf">普通</span>`;
+		    	  }else{
+		    		  kftml = `<span class="yh">vip</span>`;
+		    	  }
+		    	  return kftml;
+		      }} 	
+		      ,{field:'roomStatus', title: '状态', templet:function(res){
+		    	  var checked = res.roomStatus==1?"checked=''":'';
+		    	  return `<input type="checkbox" name="roomStatus" _id=${res.id}  ${checked} lay-skin="switch" lay-text="关闭|开启" lay-filter="isKefu" value="1">`;
+		      }}
+		      ,{field:'roomCreateTimeStr',title: '创建时间'}
+		      ,{fixed: 'right',width:100, title:'操作', toolbar: '#barDemo'}
+		    	]
+		    ],
+		    parseData:function(res){
+		    	 
+		    },
+		    request: {
+		        pageName: 'page' //页码的参数名称，默认：page
+		        ,limitName: 'limit' //每页数据量的参数名，默认：limit
+		    },
+		    //完成回调
+		     done:function(res,curr1,count){
+		    	 form.on('switch(roomStatus)', function(data){
+		    		 $.post(contextPath+currPageUrl+"auth/setKefu",{"status":data.elem.checked?1:0,"id":$(data.elem).attr("_id")},function(rt){
+	            		  if(rt.code==200){
+	            			  if(data.elem.checked){
+	            					  layer.msg("已更新为客服！");
+	            			  }else{
+	            					  layer.msg("已取消");
+	            			  }
+	            		  }else{
+	            			  layer.msg(rt.msg);
+	            		  }
+	            	  });
+	            });  
+		    } 
+		  });
+	}
+	
+    //监听行单击事件
+/*     table.on('row(table)', function(obj){
+    	if($(event.target).hasClass("layui-btn")){
+    		return false;
+    	}else{
+    		getdetail(obj.data);
+    	}
+    }); */
+       
+	 table.on('toolbar(table)', function(obj){ //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+		  var data = obj.data; //获得当前行数据
+		  var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+		  var tr = obj.tr; //获得当前行 tr 的DOM对象
+		 if(layEvent === 'add'){ //查看
+			addOrUpdata(null);
+		 }
+	
+	});
+	//监听行工具事件
+	  table.on('tool(table)', function(obj){
+	    var id = obj.data.id;
+	    if(obj.event === 'del'){
+	    	del(id);
+	    } 
+	  });
+    
+	  function addOrUphtml(data){//type :1  修改   type:2 完善
+			return `
+	    	<form class="layui-form addForm" id="addForm" action="" lay-filter="addForm" style="padding:20px">
+	    	  <div class="layui-form-item">
+	    	    <label class="layui-form-label">房间名称：</label>
+	    	    <div class="layui-input-block">
+	    	    	<input type="text" name="roomName" lay-verify="required" autocomplete="off" placeholder="请输入名称" class="layui-input" maxlength="50">
+	    	    </div>
+	    	  </div>
+	
+			  <div class="layui-form-item">
+	    	    <label class="layui-form-label">封面图片：</label>
+	    	  	<a class="imgClick" ><img id="imgView" style="cursor:pointer; width: 100px; height: 80px;" src="${data==null?"":data.roomImg}" onerror="javascript:this.src='${contextPath}/image/error.png';" alt="pic"/></a>
+				<input type="file" class="form-control" name="file" id="img" style="width: 100px; height: 80px;display: none;position: absolute;top: 0px;" />
+				<div class="layui-inline layui-word-aux" id="proImg" style="color:red">
+				  图片大小最好限制为 60KB 
+				</div>
+		     </div>
+			 <input type="text" name="id" value="" hidden="hidden">
+	    	  <div class="" style="width:100%;text-align:center;">
+				<button  class="layui-btn submit" lay-submit="" lay-filter="submit">立即提交</button>
+				<button type="button" id="back" class="layui-btn layui-btn-primary">返回</button>
+			  </div>
+	    	</form>
+	    	  `;
+		}
+      function changImg(e) {
+			for (var i = 0; i < e.target.files.length; i++) {
+				var file = e.target.files.item(i);
+				if (!(/^image\/.*$/i.test(file.type))) {
+					layer.msg("请选择图片类型文件");
+					continue; // 不是图片 就跳出这一次循环
+				}
+				;
+				// 实例化FileReader API
+				var freader = new FileReader();
+				freader.readAsDataURL(file);
+				freader.onload = function(e) {
+					$("#imgView").attr("src", e.target.result);
+					$("#imgView").css("border","none");
+					// $("#imgView").parent().attr("href",e.target.result);
+				}
+			}
+		}
+      
+      
+      
+      var closelayer=``;
+		 //新增或修改信息
+		 function addOrUpdata(object){
+			 var branchId = object == null ? 0 : object.id, sourceName = ``,
+		 	closelayer = layer_open("",["100%","100%"],object==null?"新增":"修改", addOrUphtml(object),function(){
+				//修改
+		 		if (object != null) {
+					$("input[name='id']").val(object.id);
+					$("input[name='roomName']").val(object.title);
+				}
+				$("#back").click(function(){
+					layer.close(closelayer)
+				})
+				
+				//图片
+				setTimeout(function(){
+					$(".imgClick").on("click",function(){
+						$("#img").click();
+					})
+					$("#img").change(function(e){
+						if(this.files.length>0){
+							$("#proImg").html(this.files[0].name);
+							changImg(e);//upload2.js
+						}
+					})	
+				},500)
+				
+		 	});
+
+		  }
+		 
+		 //监听提交
+	    form.on('submit(submit)', submit);
+	    function submit(data){
+	    	if(data.field.id==''&& data.field.file==""){
+	    		$("#imgView").css("border","1px #FF5722 solid");
+	    		layer_msg(4,"图片不能为空");
+	    		return false;
+	    	}
+	    	//防止重复提交
+	    	if($(".submit").hasClass("layui-btn-disabled")){
+	    		return false;
+	    	}
+	    	$(".submit").addClass("layui-btn-disabled").html("提交中...");
+	    	
+	    	console.log("提交")
+	    	console.log($("textarea[name='context']").html());
+	    	
+	    	var formData = new FormData($('#addForm')[0]);
+			$.ajax({
+					url:contextPath+currPageUrl+"room/addOrUpdate",
+					type:"POST",
+					data:formData,
+					dataType:"json",
+					contentType: false,  
+			        processData: false,  
+			    	success:functi on(data){
+    					if(data.code ==200){
+    						layer.closeAll();
+    						table.reload("test", {}); //表格重载
+    					}
+    					else{
+    						layer.msg(data.msg);
+    						$(".submit").removeClass("layui-btn-disabled").html("立即提交");
+    					}
+    				},
+    				error:function(){
+    					$(".submit").removeClass("layui-btn-disabled").html("立即提交");
+    				}
+				});	
+	        return false;
+	    }
+
+		 function del(ids){
+			 layer.confirm('确定删除么', function(index){
+			      layer.close(index);
+			      $.post(contextPath+currPageUrl+"room/delRoom",{"ids":JSON.stringify(ids)},function(rt){
+	         		  if(rt.code==200){
+	         			  table.reload("test"); //表格重载
+	         		  }
+	         		 layer.msg(rt.msg);
+	         	 });
+			 });
+			 
+		 }
+
+  });
+  </script>
+</body>
+</html>

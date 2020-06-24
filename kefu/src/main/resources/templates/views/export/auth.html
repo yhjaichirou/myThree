@@ -1,0 +1,287 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="template::cmsHeader(后台用户管理)"></head>
+<style>
+.imgTx{
+	width:50px;
+	
+}
+</style>
+<body>
+
+	<div class="layui-fluid">
+		<div class="layui-card">
+
+			<div class="layui-form " style="padding: 20px 10px 10px 10px;">
+				<!-- <div class="layui-form-item" id="area-picker">
+					<label class="layui-form-label" style="width: 30px">省：</label>
+					<div class="layui-input-inline" style="width: 150px;">
+						<select name="province" class="province-selector" data-value="请选择"
+							lay-filter="province-1">
+							<option value="">请选择省</option>
+						</select>
+					</div>
+					<label class="layui-form-label" style="width: 30px">市：</label>
+					<div class="layui-input-inline" style="width: 150px;">
+						<select name="city" class="city-selector" data-value="请选择"
+							lay-filter="city-1">
+							<option value="">请选择市</option>
+						</select>
+					</div>
+					<label class="layui-form-label" style="width: 30px">区：</label>
+					<div class="layui-input-inline" style="width: 150px;">
+						<select name="county" class="county-selector" data-value="请选择"
+							lay-filter="county-1">
+							<option value="">请选择区</option>
+						</select>
+					</div>
+
+				</div> -->
+				<div class="layui-form-item">
+					<label class="layui-form-label" style="width: 120px;text-align: left;">姓名/电话/身份证</label>
+					<div class="layui-input-inline" style="width: 227px">
+							<input type="text" name="search" placeholder="姓名、电话号、身份证"
+								autocomplete="off" class="layui-input"  maxlength="30">
+					</div>
+					
+					<!-- <label class="layui-form-label" style="width: 43px">状态：</label>
+					<div class="layui-input-inline">
+						<select name="auth" lay-filter="auth">
+							<option value="">请选择</option>
+							<option value="3">未认证</option>
+							<option value="4">待认证</option>
+							<option value="6">已认证</option>
+							<option value="5">认证失败</option>
+						</select>
+					</div> -->
+					<label class="layui-form-label" style="width: 43px">类型：</label>
+					<div class="layui-input-inline">
+						<select name="type" lay-filter="type">
+							<option value="">请选择</option>
+							<option value="1">用户</option>
+							<option value="2">客服</option>
+						</select>
+					</div>
+				</div>
+			</div>
+
+
+			<div class="layui-card-body">
+					<table class="layui-table" id="table" lay-filter="table">
+					</table>
+
+					<script type="text/html" id="toolbarDemo">
+                    
+				</script>
+
+					<!-- 	 <button class="layui-btn layui-btn-sm" lay-event="batchdel" id="batchdel">删除</button> -->
+					<script type="text/html" id="barDemo">
+    						<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+					
+				</script>
+
+
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 模板js -->
+	<div th:replace="template::commonJs"></div>
+	<script th:inline="javascript" type="text/javascript">
+	layui.config({
+	    base: contextPath+"/layuiadmin/modules/" 
+  	}).use(['table',"form","rate","element"], function(){
+    var $ = layui.$
+    ,form = layui.form
+    ,table = layui.table
+    ,element = layui.element
+    ,rate = layui.rate 
+    ,currPageUrl = "/export/";
+
+	$("input[name='search']").bind('input propertychange', function() {
+		var inuptvalue = $(this).val();
+		var data = {
+        		search:inuptvalue,
+        		type:$("select[name='type']").val()
+        };
+		 render(data);
+	});
+	form.on("select(type)",function(data){
+		var data = {
+        		search:$("input[name='search']").val(),
+        		//auth:$("select[name='auth']").val(),
+        		type:data.value
+        };
+		 render(data);
+	})
+	
+/* 	form.on("select(auth)",function(data){
+		var data = {
+        		city:$("select[name='city']").val(),
+        		county:$("select[name='county']").val(),
+        		province:$("select[name='province']").val(),
+        		search:$("input[name='search']").val(),
+        		auth:data.value
+        };
+		 render(data);
+	}) */
+	
+	
+	
+/* 	 layarea.render({
+	        elem: '#area-picker',
+	         data: {
+	             province: '广东省',
+	             city: '深圳市',
+	           county: '龙岗区',
+	         },
+	        change: function (res) {
+	            //选择结果
+	            var data = {
+	            		city:res.city,
+	            		county:res.county,
+	            		province:res.province,
+	            		search:$("input[name='search']").val(),
+	            		auth:$("select[name='auth']").val()
+	            };
+	            render(data);
+	        }
+	    }); */
+	
+	 function ValidateValue(textbox) {
+			if(textbox == "" ){
+				return true;
+			}
+			var IllegalString = "[`~!#$^&*()=|{}':;',\\[\\].<>/?~！#￥……&*（）——|{}【】‘；：”“'。，、？]‘’";
+			var textboxvalue = textbox;
+			var index = textboxvalue.length - 1;
+			var s = textbox.charAt(index);
+			if (IllegalString.indexOf(s) >= 0) {
+				s = textboxvalue.substring(0, index);
+				textbox.value = s;
+				return false;
+			} else{
+				return true;
+			}
+	} 
+	    
+	render();
+    function render(data){
+    	/* if(!ValidateValue(data.city) || !ValidateValue(data.county) || !ValidateValue(data.province) 
+				|| !ValidateValue(data.search)){
+			layer.msg("错误的搜索值！");
+			return false;
+		} */
+		table.render({
+		    elem: '#table'
+		    ,url:contextPath+currPageUrl+'auth/getList'
+		    ,toolbar: '#toolbarDemo'
+		    ,page:true
+		    ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+			,where:data
+		    ,cols: [
+		    	[
+		      {title: '序号',templet: '#xuhao', width:80}
+		      ,{field:'nickName',title: '姓名',width:180}
+		      ,{field:'mobile',title: '微信头像',width:180 , templet:function(d){
+		    	  return `<img src="${d.avatarUrl}"  class="imgTx"/>`;
+		      }} 
+		      ,{field:'mobile',title: '电话',width:180}
+		      ,{field:'type',title: '类型',width:180, templet:function(d){
+		    	  var kftml = "";
+		    	  if(d.type==1){
+		    		  kftml = `<span class="kf">客服</span>`;
+		    	  }else{
+		    		  kftml = `<span class="yh">用户</span>`;
+		    	  }
+		    	  return kftml;
+		      }} 	
+		      ,{field:'isKefu', title: '是否客服', templet:function(res){
+		    	  var checked = res.type==2?"checked=''":'';
+		    	  return `<input type="checkbox" name="isKefu" _id=${res.id}  ${checked} lay-skin="switch" lay-text="否|是" lay-filter="isKefu" value="1">`;
+		      }}
+		      ,{field:'roomName',title: '所在房间'}
+		      ,{fixed: 'right',width:100, title:'操作', toolbar: '#barDemo'}
+		    	]
+		    ],
+		    parseData:function(res){
+		    	 
+		    },
+		    request: {
+		        pageName: 'page' //页码的参数名称，默认：page
+		        ,limitName: 'limit' //每页数据量的参数名，默认：limit
+		    },
+		    //完成回调
+		     done:function(res,curr1,count){
+		    	 form.on('switch(isKefu)', function(data){
+		    		 $.post(contextPath+currPageUrl+"auth/setKefu",{"status":data.elem.checked?2:1,"id":$(data.elem).attr("_id")},function(rt){
+	            		  if(rt.code==200){
+	            			  if(data.elem.checked){
+	            					  layer.msg("已更新为客服！");
+	            			  }else{
+	            					  layer.msg("已取消");
+	            			  }
+	            		  }else{
+	            			  layer.msg(rt.msg);
+	            		  }
+	            	  });
+	            });  
+		    } 
+		  });
+	}
+	
+    //监听行单击事件
+/*     table.on('row(table)', function(obj){
+    	if($(event.target).hasClass("layui-btn")){
+    		return false;
+    	}else{
+    		getdetail(obj.data);
+    	}
+    }); */
+       
+	 table.on('toolbar(table)', function(obj){ //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+		  var data = obj.data; //获得当前行数据
+		  var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+		  var tr = obj.tr; //获得当前行 tr 的DOM对象
+		 if(layEvent === 'add'){ //查看
+			addOrUpdata(null);
+		 } else if(layEvent === 'addCommit'){ //查看
+			addOrUpdata(null);
+		 } else if(layEvent === 'addzb'){ //查看
+			addOrUpdata(null,1);//按钮1
+		 } 
+	
+	});
+	//监听行工具事件
+	  table.on('tool(table)', function(obj){
+	    var id = obj.data.id;
+	    if(obj.event === 'del'){
+	    	del(id);
+	    } 
+	  });
+    
+	  function del(id){
+		  $.ajax({
+				url:contextPath+"/export/auth/del",
+				type:'post',
+				data:{id:id},
+				success:function(res){
+					if(res.code == 200){
+						table.reload('table');
+						layer.msg(res.msg,{ time: 2000,end:function(){
+							layer.closeAll();
+							table.reload('table');	
+						}});
+						
+					}else{
+						layer_msg(4,res.msg);
+					}
+				}
+			});
+	  }
+
+  });
+  </script>
+</body>
+</html>

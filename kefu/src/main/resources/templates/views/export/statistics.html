@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="template::cmsHeader(后台用户管理)"></head>
+<style>
+.bold {
+	font-weight: bold;
+}
+
+#man, #woman, #apply, #apply_ok, #nocom {
+	color: red;
+}
+</style>
+<body>
+
+	<div style="padding: 30px;">
+
+		<div style="text-align: center; width: 100%;">
+
+
+			<div class="layui-form " >
+				<div class="layui-form-item" id="area-picker" th:if="${session.loginUser.policeName==null || session.loginUser.policeName==''}">
+					<label class="layui-form-label" style="width: 30px">省：</label>
+					<div class="layui-input-inline" style="width: 200px;">
+						<select name="province" class="province-selector" data-value="请选择"
+							lay-filter="province-1">
+							<option value="">请选择省</option>
+						</select>
+					</div>
+					<label class="layui-form-label" style="width: 30px">市：</label>
+					<div class="layui-input-inline" style="width: 200px;">
+						<select name="city" class="city-selector" data-value="请选择"
+							lay-filter="city-1">
+							<option value="">请选择市</option>
+						</select>
+					</div>
+					<label class="layui-form-label" style="width: 30px">区：</label>
+					<div class="layui-input-inline" style="width: 200px;">
+						<select name="county" class="county-selector" data-value="请选择"
+							lay-filter="county-1">
+							<option value="">请选择区</option>
+						</select>
+					</div>
+
+					<div class="layui-input-inline" style="width: 320px;">
+						<label class="layui-form-label" style="display: inline-block">派出所</label>
+						<div class="layui-input-inline">
+							<input type="text" name="pcs" id="pcs" placeholder="请输入派出所名称"
+								class="layui-input" maxlength="50">
+							<!-- 	onkeyup="value=value.replace(/[\W]/g,'')"  onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))" -->
+						</div>
+					</div>
+					
+					
+					
+				</div>
+
+			</div>
+
+		</div>
+
+		<div class="layui-row  layui-col-space15">
+			<div class="layui-col-md12 layui-col-xs12">
+				<div class="layui-card">
+					<div class="layui-card-header">统计信息</div>
+					<div class="layui-card-body layadmin-takerates">
+						<ul class="layui-row layuiadmin-card-team">
+							<li class="layui-col-xs4 layui-col-md4"
+								style="border-right: 2px solid #eee;"><lable
+									style="text-align:center;display: block;font-weight:bold; margin-bottom: 20px;">男女人数</lable>
+								<div class="layui-row  layui-col-space15"
+									style="text-align: center;">
+									<div class="layui-col-md6 layui-col-xs6"
+										style="border-right: 1px solid #eee">
+										<span>男：</span><span id="man">0</span> <span>人</span>
+									</div>
+									<div class="layui-col-md6 layui-col-xs6">
+										<span>女：</span><span id="woman">0</span> <span>人</span>
+									</div>
+								</div></li>
+
+							<li class="layui-col-xs4 layui-col-md8"><lable
+									style="text-align:center;display: block;font-weight:bold; margin-bottom: 20px;">居民证办理</lable>
+								<div class="layui-row  layui-col-space15"
+									style="text-align: center;">
+									<div class="layui-col-md4 layui-col-xs4"
+										style="border-right: 1px solid #eee">
+										<span>申请：</span><span id="apply">0</span><span>人</span>
+									</div>
+									<div class="layui-col-md4 layui-col-xs4"
+										style="border-right: 1px solid #eee">
+										<span>审核通过：</span><span id="apply_ok">0</span><span>人</span>
+									</div>
+									<div class="layui-col-md4 layui-col-xs4">
+										<span>资料未完善：</span><span id="nocom">0</span><span>人</span>
+									</div>
+								</div></li>
+
+						</ul>
+					</div>
+				</div>
+			</div>
+
+
+		</div>
+
+
+	</div>
+
+
+
+	<!-- 模板js -->
+	<div th:replace="template::commonJs"></div>
+	<script th:inline="javascript" type="text/javascript">
+	var loginUser = [[${session.loginUser}]];
+		function ValidateValue(textbox) {
+			if (textbox == "") {
+				return true;
+			}
+			var IllegalString = "[`~!#$^&*()=|{}':;',\\[\\].<>/?~！#￥……&*（）——|{}【】‘；：”“'。，、？]‘’";
+			var textboxvalue = textbox ==undefined?"":textbox;
+			if(textboxvalue==''){
+				return false;
+			}
+			var index = textboxvalue.length - 1;
+			var s = textbox.charAt(index);
+			if (IllegalString.indexOf(s) >= 0) {
+				s = textboxvalue.substring(0, index);
+				textbox.value = s;
+				return false;
+			} else {
+				return true;
+			}
+		}
+
+		layui
+				.config({
+					base : contextPath + "/layuiadmin/modules/"
+				})
+				.use(
+						[ "form", "rate", 'layarea' ],
+						function() {
+							var $ = layui.$, form = layui.form, layarea = layui.layarea;
+							var currPageUrl = "/export/";
+
+							layarea.render({
+								elem : '#area-picker',
+								/*   data: {
+								      province: '广东省',
+								      city: '深圳市',
+								    county: '龙岗区',
+								  }, */
+								change : function(res) {
+									//选择结果
+									var data = {
+										city : res.city,
+										county : res.county,
+										province : res.province,
+										pcs : $("#pcs").val()
+									};
+									ajaxAreaData(data);
+								}
+							});
+
+							var data = {
+								city : "",
+								county : "",
+								province : "",
+								pcs : $("#pcs").val(),
+							};
+							ajaxAreaData(data);
+
+							$("#pcs").keyup(
+									function() {
+										var data = {
+											city : $("select[name='city']")
+													.val(),
+											county : $("select[name='county']")
+													.val(),
+											province : $(
+													"select[name='province']")
+													.val(),
+											pcs : $("#pcs").val(),
+										};
+										ajaxAreaData(data)
+
+									});
+
+							form.render('select', 'test2');
+							form.render('select');
+							function ajaxAreaData(data) {
+								if(loginUser.policeName==null || loginUser.policeName==''){
+									if (!ValidateValue(data.city)
+											|| !ValidateValue(data.county)
+											|| !ValidateValue(data.province)
+											|| !ValidateValue(data.pcs)) {
+										layer.msg("错误的搜索值！")
+										return false;
+									}
+								}
+								$
+										.ajax({
+											url : contextPath
+													+ "/export/statistics/ajaxAreaData",
+											type : 'post',
+											data : data,
+											success : function(res) {
+												if (res.code == 200) {
+													var result = res.data;
+													$("#man").html(result.man);
+													$("#woman").html(
+															result.woman);
+													$("#apply").html(
+															result.apply);
+													$("#apply_ok").html(
+															result.apply_ok);
+													$("#nocom").html(
+															result.nocom);
+												} else {
+													layer_msg(4, res.msg);
+												}
+											}
+										});
+							}
+
+						});
+	</script>
+</body>
+</html>
